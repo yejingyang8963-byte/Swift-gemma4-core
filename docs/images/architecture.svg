@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 720" width="1000" height="720" role="img" aria-label="Gemma4SwiftCore architecture diagram">
+  <title>Gemma4SwiftCore architecture</title>
+
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0a0a1f"/>
+      <stop offset="100%" stop-color="#11112a"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L10,6 L0,12 z" fill="#9ad0ff"/>
+    </marker>
+  </defs>
+
+  <rect width="1000" height="720" fill="url(#bg)"/>
+
+  <!-- Title -->
+  <g font-family="-apple-system, 'SF Pro Display', sans-serif" fill="#FFFFFF">
+    <text x="500" y="44" font-size="22" font-weight="600" text-anchor="middle">Gemma4SwiftCore — forward pass</text>
+    <text x="500" y="68" font-size="13" opacity="0.55" text-anchor="middle">
+      Token IDs → embeddings → 35 decoder layers → final norm → logits
+    </text>
+  </g>
+
+  <!-- Stage 1: input -->
+  <g>
+    <rect x="380" y="100" width="240" height="44" rx="10" fill="#1e2940" stroke="#3a5582" stroke-width="1.5"/>
+    <text x="500" y="128" font-family="-apple-system, sans-serif" font-size="14" fill="#FFFFFF" text-anchor="middle">
+      input_ids  [batch, seq]
+    </text>
+  </g>
+
+  <!-- Stage 2: embedding -->
+  <g>
+    <rect x="340" y="170" width="320" height="56" rx="10" fill="#22335a" stroke="#4a73b2" stroke-width="1.5"/>
+    <text x="500" y="194" font-family="-apple-system, sans-serif" font-size="14" font-weight="600" fill="#FFFFFF" text-anchor="middle">
+      embed_tokens  ×  sqrt(hidden_size)
+    </text>
+    <text x="500" y="214" font-family="-apple-system, sans-serif" font-size="11" fill="#9ad0ff" text-anchor="middle">
+      Sources/Gemma4SwiftCore/Model/Gemma4TextInner.swift
+    </text>
+  </g>
+
+  <!-- Stage 3: split into PLE + main -->
+  <g>
+    <rect x="80" y="260" width="320" height="80" rx="10" fill="#2a1f44" stroke="#7a4fb5" stroke-width="1.5"/>
+    <text x="240" y="285" font-family="-apple-system, sans-serif" font-size="14" font-weight="600" fill="#FFFFFF" text-anchor="middle">
+      computePerLayerInputs()
+    </text>
+    <text x="240" y="305" font-family="-apple-system, sans-serif" font-size="11" fill="#c8a4ff" text-anchor="middle">
+      Path A: embed_tokens_per_layer × sqrt(D)
+    </text>
+    <text x="240" y="322" font-family="-apple-system, sans-serif" font-size="11" fill="#c8a4ff" text-anchor="middle">
+      Path B: per_layer_model_projection / sqrt(H)
+    </text>
+  </g>
+
+  <g>
+    <rect x="600" y="260" width="320" height="80" rx="10" fill="#2a1f44" stroke="#7a4fb5" stroke-width="1.5"/>
+    <text x="760" y="285" font-family="-apple-system, sans-serif" font-size="14" font-weight="600" fill="#FFFFFF" text-anchor="middle">
+      globalRopeOffset
+    </text>
+    <text x="760" y="305" font-family="-apple-system, sans-serif" font-size="11" fill="#c8a4ff" text-anchor="middle">
+      Read first non-shared cache.offset BEFORE
+    </text>
+    <text x="760" y="322" font-family="-apple-system, sans-serif" font-size="11" fill="#c8a4ff" text-anchor="middle">
+      any cache.update — global, not per-layer
+    </text>
+  </g>
+
+  <!-- Stage 4: decoder layer loop (single representative box) -->
+  <g>
+    <rect x="180" y="380" width="640" height="190" rx="14" fill="#1a2f3f" stroke="#3a8aab" stroke-width="2"/>
+    <text x="500" y="408" font-family="-apple-system, sans-serif" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">
+      for i in 0..&lt;35:  Gemma4TextDecoderLayer
+    </text>
+
+    <!-- attention sub-box -->
+    <rect x="210" y="425" width="280" height="60" rx="8" fill="#234c66" stroke="#4ea7d4" stroke-width="1"/>
+    <text x="350" y="448" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#FFFFFF" text-anchor="middle">
+      Gemma4TextAttention
+    </text>
+    <text x="350" y="468" font-family="-apple-system, sans-serif" font-size="10" fill="#9ad0ff" text-anchor="middle">
+      per-layer head_dim · KV donor lookup · ProportionalRoPE
+    </text>
+
+    <!-- mlp sub-box -->
+    <rect x="510" y="425" width="280" height="60" rx="8" fill="#234c66" stroke="#4ea7d4" stroke-width="1"/>
+    <text x="650" y="448" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#FFFFFF" text-anchor="middle">
+      Gemma4TextMLP (SwiGLU)
+    </text>
+    <text x="650" y="468" font-family="-apple-system, sans-serif" font-size="10" fill="#9ad0ff" text-anchor="middle">
+      double-wide on KV-shared layers
+    </text>
+
+    <!-- PLE sub-box -->
+    <rect x="210" y="500" width="580" height="55" rx="8" fill="#3a234e" stroke="#a472d8" stroke-width="1"/>
+    <text x="500" y="523" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#FFFFFF" text-anchor="middle">
+      PLE block:  gate × per_layer_input → projection → norm → residual
+    </text>
+    <text x="500" y="542" font-family="-apple-system, sans-serif" font-size="10" fill="#d0a4ff" text-anchor="middle">
+      then  output × layer_scalar
+    </text>
+  </g>
+
+  <!-- Stage 5: final norm -->
+  <g>
+    <rect x="340" y="600" width="320" height="44" rx="10" fill="#22335a" stroke="#4a73b2" stroke-width="1.5"/>
+    <text x="500" y="628" font-family="-apple-system, sans-serif" font-size="14" font-weight="600" fill="#FFFFFF" text-anchor="middle">
+      final RMSNorm  →  lm_head  →  softcap(tanh)
+    </text>
+  </g>
+
+  <!-- Stage 6: output -->
+  <g>
+    <rect x="380" y="666" width="240" height="40" rx="10" fill="#1e2940" stroke="#3a5582" stroke-width="1.5"/>
+    <text x="500" y="691" font-family="-apple-system, sans-serif" font-size="13" fill="#FFFFFF" text-anchor="middle">
+      logits  [batch, seq, vocab]
+    </text>
+  </g>
+
+  <!-- Arrows -->
+  <g stroke="#9ad0ff" stroke-width="2" fill="none">
+    <!-- input → embed -->
+    <line x1="500" y1="144" x2="500" y2="170" marker-end="url(#arrow)"/>
+    <!-- embed → PLE -->
+    <line x1="430" y1="226" x2="240" y2="260" marker-end="url(#arrow)"/>
+    <!-- embed → ropeOffset -->
+    <line x1="570" y1="226" x2="760" y2="260" marker-end="url(#arrow)"/>
+    <!-- PLE → decoder -->
+    <line x1="240" y1="340" x2="240" y2="380" marker-end="url(#arrow)"/>
+    <!-- ropeOffset → decoder -->
+    <line x1="760" y1="340" x2="760" y2="380" marker-end="url(#arrow)"/>
+    <!-- decoder → final norm -->
+    <line x1="500" y1="570" x2="500" y2="600" marker-end="url(#arrow)"/>
+    <!-- final → output -->
+    <line x1="500" y1="644" x2="500" y2="666" marker-end="url(#arrow)"/>
+  </g>
+</svg>

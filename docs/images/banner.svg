@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 360" width="1440" height="360" role="img" aria-label="Gemma4SwiftCore — Native Swift Inference for Google Gemma 4">
+  <title>Gemma4SwiftCore</title>
+  <desc>Native Swift inference for Google Gemma 4 — runs on iPhone, iPad and Mac.</desc>
+
+  <!-- Background: midnight blue gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#050518"/>
+      <stop offset="50%" stop-color="#0a0a2a"/>
+      <stop offset="100%" stop-color="#0e0e35"/>
+    </linearGradient>
+    <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFF8E8" stop-opacity="0.95"/>
+      <stop offset="40%" stop-color="#F5E6C8" stop-opacity="0.85"/>
+      <stop offset="80%" stop-color="#E8D4A8" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#D4C090" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="moonHalo" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFE8B0" stop-opacity="0.20"/>
+      <stop offset="60%" stop-color="#FFD888" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#FFC868" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="softBlur" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+  </defs>
+
+  <rect width="1440" height="360" fill="url(#bgGradient)"/>
+
+  <!-- Far stars (very dim, edge-distributed) -->
+  <g fill="#FFFFFF" opacity="0.45">
+    <circle cx="80" cy="60" r="1.0"/>
+    <circle cx="160" cy="100" r="1.4"/>
+    <circle cx="240" cy="40" r="0.9"/>
+    <circle cx="340" cy="85" r="1.2"/>
+    <circle cx="420" cy="55" r="1.0"/>
+    <circle cx="520" cy="110" r="1.5"/>
+    <circle cx="640" cy="45" r="1.0"/>
+    <circle cx="780" cy="80" r="1.3"/>
+    <circle cx="900" cy="35" r="1.1"/>
+    <circle cx="1020" cy="90" r="1.5"/>
+    <circle cx="1140" cy="50" r="1.0"/>
+    <circle cx="1260" cy="105" r="1.4"/>
+    <circle cx="1360" cy="65" r="1.1"/>
+
+    <circle cx="60" cy="290" r="1.2"/>
+    <circle cx="140" cy="320" r="1.0"/>
+    <circle cx="220" cy="280" r="1.3"/>
+    <circle cx="320" cy="330" r="0.9"/>
+    <circle cx="420" cy="295" r="1.4"/>
+    <circle cx="540" cy="320" r="1.0"/>
+    <circle cx="660" cy="285" r="1.2"/>
+    <circle cx="780" cy="325" r="1.1"/>
+    <circle cx="900" cy="290" r="1.3"/>
+    <circle cx="1020" cy="320" r="1.0"/>
+    <circle cx="1140" cy="285" r="1.4"/>
+    <circle cx="1260" cy="320" r="1.0"/>
+    <circle cx="1360" cy="295" r="1.2"/>
+  </g>
+
+  <!-- Moon: outermost halo -->
+  <circle cx="220" cy="180" r="180" fill="url(#moonHalo)"/>
+  <!-- Moon: middle glow -->
+  <circle cx="220" cy="180" r="120" fill="url(#moonHalo)" opacity="0.7"/>
+  <!-- Moon body -->
+  <circle cx="220" cy="180" r="78" fill="url(#moonGlow)"/>
+  <!-- Moon craters (subtle) -->
+  <g opacity="0.18" filter="url(#softBlur)">
+    <ellipse cx="200" cy="160" rx="14" ry="12" fill="#000"/>
+    <ellipse cx="240" cy="195" rx="16" ry="13" fill="#000"/>
+    <ellipse cx="208" cy="205" rx="8" ry="7" fill="#000"/>
+    <ellipse cx="245" cy="158" rx="6" ry="5" fill="#000"/>
+  </g>
+
+  <!-- Wordmark -->
+  <g font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif" fill="#FFFFFF">
+    <!-- Main title -->
+    <text x="430" y="170" font-size="76" font-weight="700" letter-spacing="-2">Gemma4SwiftCore</text>
+
+    <!-- Tagline -->
+    <text x="430" y="218" font-size="26" font-weight="400" opacity="0.85">
+      Native Swift inference for Google Gemma 4
+    </text>
+
+    <!-- Subline -->
+    <text x="430" y="252" font-size="18" font-weight="400" opacity="0.55">
+      iPhone · iPad · Mac · 100% on-device · MIT License
+    </text>
+
+    <!-- Author byline -->
+    <text x="430" y="305" font-size="16" font-weight="500" opacity="0.65">
+      Built by Jingyang Ye
+    </text>
+  </g>
+
+  <!-- Subtle dividing line -->
+  <line x1="430" y1="270" x2="900" y2="270" stroke="#FFFFFF" stroke-width="1" opacity="0.15"/>
+</svg>
