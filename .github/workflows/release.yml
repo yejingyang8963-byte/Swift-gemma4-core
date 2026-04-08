@@ -1,0 +1,67 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to release (e.g. v0.1.0)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  draft-release:
+    name: Draft GitHub Release from tag
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine tag
+        id: tag
+        run: |
+          if [ -n "${{ github.event.inputs.tag }}" ]; then
+            echo "name=${{ github.event.inputs.tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Verify CHANGELOG entry exists
+        run: |
+          tag="${{ steps.tag.outputs.name }}"
+          version="${tag#v}"
+          if ! grep -q "\[$version\]" CHANGELOG.md; then
+            echo "❌ CHANGELOG.md does not contain a section for $version"
+            echo "   Please update CHANGELOG.md before tagging."
+            exit 1
+          fi
+          echo "✅ CHANGELOG.md has [$version]"
+
+      - name: Run final test before release
+        run: swift test --filter "ConfigurationTests|SanitizeTests|ProportionalRoPETests|PromptFormattingTests"
+
+      - name: Extract release notes from CHANGELOG
+        id: notes
+        run: |
+          tag="${{ steps.tag.outputs.name }}"
+          version="${tag#v}"
+          awk -v ver="$version" '
+            /^## \[/{ if (in_section) exit; if ($0 ~ "\\[" ver "\\]") in_section=1; next }
+            in_section { print }
+          ' CHANGELOG.md > release_notes.md
+          echo "Generated release notes:"
+          cat release_notes.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.name }}
+          name: ${{ steps.tag.outputs.name }}
+          body_path: release_notes.md
+          draft: true
+          prerelease: ${{ contains(steps.tag.outputs.name, '-') }}

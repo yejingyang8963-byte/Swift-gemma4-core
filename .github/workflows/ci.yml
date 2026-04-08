@@ -1,0 +1,102 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  swift-build-and-test:
+    name: Swift ${{ matrix.swift }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14]
+        swift: ["5.9", "5.10"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: |
+          if [ "${{ matrix.swift }}" = "5.10" ]; then
+            sudo xcode-select -switch /Applications/Xcode_15.4.app
+          else
+            sudo xcode-select -switch /Applications/Xcode_15.4.app
+          fi
+          swift --version
+
+      - name: Cache SwiftPM build
+        uses: actions/cache@v4
+        with:
+          path: |
+            .build
+            ~/Library/Caches/org.swift.swiftpm
+          key: spm-${{ runner.os }}-swift${{ matrix.swift }}-${{ hashFiles('Package.resolved') }}
+          restore-keys: |
+            spm-${{ runner.os }}-swift${{ matrix.swift }}-
+
+      - name: swift build
+        run: swift build -v
+
+      - name: swift test (pure-Swift suites only)
+        run: |
+          swift test -v --filter "ConfigurationTests|SanitizeTests|ProportionalRoPETests|PromptFormattingTests|NetworkIntegrationTests"
+
+  xcodebuild-test:
+    name: xcodebuild test (full MLX suite, ${{ matrix.destination }})
+    runs-on: macos-14
+    strategy:
+      fail-fast: false
+      matrix:
+        destination:
+          - "platform=macOS,arch=arm64"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode
+        run: sudo xcode-select -switch /Applications/Xcode_15.4.app
+
+      - name: Resolve packages
+        run: xcodebuild -resolvePackageDependencies -scheme Gemma4SwiftCore
+
+      - name: Run xcodebuild test
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -scheme Gemma4SwiftCore \
+            -destination '${{ matrix.destination }}' \
+            -enableCodeCoverage YES \
+            CODE_SIGNING_ALLOWED=NO \
+            | tee xcodebuild.log
+
+      - name: Upload xcodebuild log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcodebuild-log-${{ matrix.destination }}
+          path: xcodebuild.log
+
+  lint:
+    name: SwiftLint
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install SwiftLint
+        run: brew install swiftlint
+      - name: Run SwiftLint (warnings allowed, errors fail the build)
+        run: swiftlint --strict --reporter github-actions-logging
+
+  forbidden-words:
+    name: Forbidden-words scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan for parent-project leakage
+        run: bash scripts/verify_release.sh --check-words-only
