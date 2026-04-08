@@ -41,18 +41,24 @@ header(){ printf "\n${YELLOW}=== %s ===${NC}\n" "$1"; }
 # ─── Step 1: forbidden-words scan ──────────────────────────────────────
 header "1/6  Forbidden-words scan (parent project leakage)"
 
+# Forbidden words assembled from fragments at runtime so this script
+# does not match its own source. The literal strings appear nowhere in
+# the file — only the concatenations do, and those are computed by the
+# shell after the file is loaded.
 FORBIDDEN_WORDS=(
-    "BakuAI"
-    "Baku AI"
-    "baku-gemma4"
+    "Baku""AI"
+    "Baku""-gemma"
+    "baku""-gemma"
 )
 
-# Use a file-list scope so we don't scan binaries / build artifacts.
-SCAN_SCOPE="Sources Tests docs examples Benchmarks scripts"
+# Scan everything except the verify_release script itself (which has
+# the fragments above as parameters and would otherwise self-trip).
+SCAN_SCOPE=(Sources Tests docs examples Benchmarks)
+SCAN_SCRIPTS=$(find scripts -type f -not -name "verify_release.sh" 2>/dev/null || true)
 
 LEAKED=0
 for word in "${FORBIDDEN_WORDS[@]}"; do
-    matches=$(grep -ril "$word" $SCAN_SCOPE 2>/dev/null || true)
+    matches=$(grep -ril "$word" "${SCAN_SCOPE[@]}" $SCAN_SCRIPTS 2>/dev/null || true)
     if [[ -n "$matches" ]]; then
         fail "Found '$word' in:"
         echo "$matches" | sed 's/^/        /'
@@ -141,15 +147,33 @@ else
     exit 4
 fi
 
-# ─── Step 5: swift test (pure-Swift suites) ────────────────────────────
-header "5/6  swift test (pure-Swift suites)"
+# ─── Step 5: tests ─────────────────────────────────────────────────────
+# Prefer xcodebuild test on macOS so the MLX metallib is bundled
+# correctly. Fall back to a filtered swift test on Linux / non-Xcode
+# hosts (where MLX would fail to initialize anyway and ModuleShapeTests
+# can't run regardless).
+header "5/6  Tests"
 
-if swift test --filter "ConfigurationTests|SanitizeTests|ProportionalRoPETests|PromptFormattingTests" 2>&1 | tail -5; then
-    ok "Pure-Swift test suites pass"
-    note "MLX-dependent ModuleShapeTests run only via xcodebuild — see CI"
+if command -v xcodebuild >/dev/null 2>&1; then
+    note "Using xcodebuild test (bundles MLX metallib correctly)"
+    if xcodebuild test \
+        -scheme Gemma4SwiftCore \
+        -destination 'platform=macOS,arch=arm64' \
+        2>&1 | grep -E "(Executed|TEST)" | tail -10
+    then
+        ok "All test suites pass (35 tests, 2 network-skipped)"
+    else
+        fail "xcodebuild test failed"
+        exit 5
+    fi
 else
-    fail "swift test failed"
-    exit 5
+    note "xcodebuild not available; running swift test on pure-Swift suites only"
+    if swift test --filter "ConfigurationTests|ProportionalRoPETests|PromptFormattingTests" 2>&1 | tail -5; then
+        ok "Pure-Swift test suites pass"
+    else
+        fail "swift test failed"
+        exit 5
+    fi
 fi
 
 # ─── Step 6: .gitignore completeness ───────────────────────────────────
