@@ -1,0 +1,96 @@
+name: Bug report
+description: Report a reproducible bug in Gemma4SwiftCore
+title: "[Bug] "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug report. The more detail
+        you provide, the faster the issue can be reproduced and fixed.
+
+        For numerical / output-quality bugs, the maintainer expects
+        side-by-side comparison with Python `mlx-lm` ground truth.
+        See `CONTRIBUTING.md` → "Numerical changes" for the procedure.
+
+  - type: input
+    id: version
+    attributes:
+      label: Gemma4SwiftCore version
+      description: Run `print(Gemma4SwiftCore.version)` in your code
+      placeholder: "0.1.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      multiple: true
+      options:
+        - iOS device
+        - iOS simulator (Apple Silicon)
+        - macOS (Apple Silicon)
+        - macOS (Intel — unsupported, but please tell us anyway)
+    validations:
+      required: true
+
+  - type: input
+    id: device
+    attributes:
+      label: Device + OS version
+      placeholder: "iPhone 15 Pro, iOS 17.5; or M2 MacBook Pro, macOS 14.5"
+    validations:
+      required: true
+
+  - type: input
+    id: xcode
+    attributes:
+      label: Xcode version (run `xcodebuild -version`)
+      placeholder: "Xcode 15.4 (15F31d)"
+    validations:
+      required: true
+
+  - type: input
+    id: model
+    attributes:
+      label: Model used
+      placeholder: "mlx-community/gemma-4-e2b-it-4bit"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: |
+        Smallest possible Swift code snippet that triggers the bug. Paste
+        as a code block. The maintainer should be able to drop this into
+        a test file and run it.
+      render: swift
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Include console output, crash logs, or screenshots.
+    validations:
+      required: true
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else?
+      description: |
+        Have you tried other Gemma 4 variants? Does it reproduce on
+        macOS too? Is it timing-sensitive? Please share anything that
+        might narrow down the cause.

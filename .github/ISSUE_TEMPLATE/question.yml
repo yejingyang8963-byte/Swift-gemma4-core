@@ -1,0 +1,34 @@
+name: Question
+description: Ask about how to use Gemma4SwiftCore
+title: "[Question] "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For general questions, please first check:
+
+        1. The [README](../../README.md) and its translations
+        2. The [DocC articles](../../Sources/Gemma4SwiftCore/Documentation.docc/)
+        3. The [FAQ section in the README](../../README.md#faq)
+        4. Existing closed issues
+
+        If you still have a question, file it here. For private or
+        security-related questions, see [SECURITY.md](../../SECURITY.md)
+        instead.
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: What you've tried
+      description: |
+        Code snippets, links to docs you've read, things you've already
+        ruled out. This helps the maintainer give you a useful answer
+        instead of one you've already seen.
