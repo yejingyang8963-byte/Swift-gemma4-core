@@ -30,6 +30,9 @@ let package = Package(
         // 2.31.3 bumped swift-tools-version to 6.1.0 which requires Xcode 16.3+
         // and breaks every CI runner that ships an older Xcode by default.
         .package(url: "https://github.com/ml-explore/mlx-swift-lm.git", "2.30.0" ..< "2.31.0"),
+        // Build-time-only plugin used by `swift package generate-documentation`
+        // in .github/workflows/docc.yml to publish API docs to GitHub Pages.
+        .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.3.0"),
     ],
     targets: [
         .target(
