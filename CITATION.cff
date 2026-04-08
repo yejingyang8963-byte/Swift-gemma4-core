@@ -1,0 +1,44 @@
+cff-version: 1.2.0
+message: "If you use Gemma4SwiftCore in your research or products, please cite it as below."
+title: "Gemma4SwiftCore: Native Swift Inference for Google Gemma 4"
+abstract: >-
+  The first native Swift implementation of Google's Gemma 4 text decoder.
+  Plugs into Apple's mlx-swift-lm as a sidecar model registration so any
+  HuggingFace Gemma 4 repository can be loaded on iPhone, iPad, or Mac.
+  Implements all five Gemma 4 architectural features that distinguish it
+  from Gemma 3 (Per-Layer Embedding, KV sharing across the back half of
+  the decoder, custom proportional RoPE, per-layer head dimensions, new
+  chat protocol) and ships a chat-template bypass that produces token
+  sequences identical to Python mlx-lm's apply_chat_template.
+type: software
+authors:
+  - family-names: Ye
+    given-names: Jingyang
+    alias: yejingyang8963-byte
+    affiliation: "Independent"
+repository-code: "https://github.com/yejingyang8963-byte/Swift-gemma4-core"
+url: "https://github.com/yejingyang8963-byte/Swift-gemma4-core"
+license: MIT
+version: "0.1.0"
+date-released: "2026-04-07"
+keywords:
+  - swift
+  - mlx
+  - gemma
+  - gemma-4
+  - llm
+  - on-device-ai
+  - apple-silicon
+  - ios
+  - macos
+  - inference
+preferred-citation:
+  type: software
+  authors:
+    - family-names: Ye
+      given-names: Jingyang
+  title: "Gemma4SwiftCore: Native Swift Inference for Google Gemma 4"
+  year: 2026
+  url: "https://github.com/yejingyang8963-byte/Swift-gemma4-core"
+  license: MIT
+  version: "0.1.0"

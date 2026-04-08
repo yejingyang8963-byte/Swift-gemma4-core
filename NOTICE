@@ -1,0 +1,65 @@
+Gemma4SwiftCore
+Copyright (c) 2026 Jingyang Ye
+
+This product includes software developed as a third-party port of Google
+Gemma 4 to Apple's MLX Swift libraries. Gemma4SwiftCore is an independent
+work and is not affiliated with, endorsed by, or sponsored by Google,
+Apple, or the mlx-swift / mlx-swift-lm maintainers.
+
+================================================================================
+Third-party dependencies (loaded at build time via SwiftPM)
+================================================================================
+
+  mlx-swift
+    https://github.com/ml-explore/mlx-swift
+    Copyright (c) Apple Inc.
+    Licensed under the MIT License.
+
+  mlx-swift-lm  (Libraries: MLXLLM, MLXLMCommon, MLXNN, MLXFast)
+    https://github.com/ml-explore/mlx-swift-lm
+    Copyright (c) Apple Inc.
+    Licensed under the MIT License.
+
+  swift-transformers  (transitive dependency, used at runtime for tokenization)
+    https://github.com/huggingface/swift-transformers
+    Copyright (c) Hugging Face Inc.
+    Licensed under the Apache License 2.0.
+
+  swift-jinja  (transitive dependency, used by swift-transformers)
+    https://github.com/huggingface/swift-jinja
+    Copyright (c) Hugging Face Inc.
+    Licensed under the Apache License 2.0.
+
+================================================================================
+Reference materials NOT distributed in this repository
+================================================================================
+
+The architectural design of Gemma4SwiftCore is informed by the following
+publicly available reference materials. None of the code from these sources
+is copied verbatim into this package — only the structural design and
+numerical formulas are reproduced. The reference files themselves are not
+distributed in this repository:
+
+  HuggingFace transformers — Gemma 4 modeling implementation
+    https://github.com/huggingface/transformers/tree/main/src/transformers/models/gemma4
+    Copyright (c) The HuggingFace Inc. team.
+    Licensed under the Apache License 2.0.
+
+  mlx-lm (Python) — reference Gemma 4 text model
+    https://github.com/ml-explore/mlx-lm
+    Copyright (c) Apple Inc.
+    Licensed under the MIT License.
+
+================================================================================
+Model weights (NOT distributed by Gemma4SwiftCore)
+================================================================================
+
+Gemma4SwiftCore loads model weights at runtime from HuggingFace Hub via
+the standard mlx-swift-lm download client. The Gemma 4 weights themselves
+are published by Google under the Gemma Terms of Use:
+
+  https://ai.google.dev/gemma/terms
+
+Users of Gemma4SwiftCore are responsible for complying with the Gemma
+Terms of Use when downloading, using, or redistributing the model weights.
+Gemma4SwiftCore neither modifies nor redistributes the weights.
