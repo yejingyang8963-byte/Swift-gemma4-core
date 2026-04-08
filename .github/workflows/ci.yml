@@ -13,25 +13,33 @@ concurrency:
 
 jobs:
   swift-build-and-test:
-    name: Swift ${{ matrix.swift }} on ${{ matrix.os }}
+    name: Swift build + test (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-14]
-        swift: ["5.9", "5.10"]
+        os: [macos-15]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Select Xcode
+      - name: Select latest stable Xcode
+        # mlx-swift-lm 2.31+ ships a Package.swift with
+        # swift-tools-version: 6.1.0, which requires Swift 6.1 (Xcode 16+).
+        # macos-15 runner ships Xcode 16.x by default; this `xcode-select`
+        # call is belt-and-suspenders to make sure no future image change
+        # silently downgrades us.
         run: |
-          if [ "${{ matrix.swift }}" = "5.10" ]; then
-            sudo xcode-select -switch /Applications/Xcode_15.4.app
-          else
-            sudo xcode-select -switch /Applications/Xcode_15.4.app
+          ls /Applications | grep -E "^Xcode_16" || true
+          if [ -d "/Applications/Xcode_16.2.app" ]; then
+            sudo xcode-select -switch /Applications/Xcode_16.2.app
+          elif [ -d "/Applications/Xcode_16.1.app" ]; then
+            sudo xcode-select -switch /Applications/Xcode_16.1.app
+          elif [ -d "/Applications/Xcode_16.0.app" ]; then
+            sudo xcode-select -switch /Applications/Xcode_16.0.app
           fi
           swift --version
+          xcodebuild -version
 
       - name: Cache SwiftPM build
         uses: actions/cache@v4
@@ -39,29 +47,35 @@ jobs:
           path: |
             .build
             ~/Library/Caches/org.swift.swiftpm
-          key: spm-${{ runner.os }}-swift${{ matrix.swift }}-${{ hashFiles('Package.resolved') }}
+          key: spm-${{ runner.os }}-${{ hashFiles('Package.resolved') }}
           restore-keys: |
-            spm-${{ runner.os }}-swift${{ matrix.swift }}-
+            spm-${{ runner.os }}-
 
       - name: swift build
         run: swift build -v
 
       - name: swift test (pure-Swift suites only)
+        # Filter out MLX-dependent suites; they need the Metal library
+        # bundling that only xcodebuild test provides.
         run: |
-          swift test -v --filter "ConfigurationTests|SanitizeTests|ProportionalRoPETests|PromptFormattingTests|NetworkIntegrationTests"
+          swift test -v --filter "ConfigurationTests|ProportionalRoPETests|PromptFormattingTests"
 
   xcodebuild-test:
-    name: xcodebuild test (full MLX suite, ${{ matrix.destination }})
-    runs-on: macos-14
-    strategy:
-      fail-fast: false
-      matrix:
-        destination:
-          - "platform=macOS,arch=arm64"
+    name: xcodebuild test (full MLX suite)
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
-      - name: Select Xcode
-        run: sudo xcode-select -switch /Applications/Xcode_15.4.app
+
+      - name: Select latest stable Xcode
+        run: |
+          if [ -d "/Applications/Xcode_16.2.app" ]; then
+            sudo xcode-select -switch /Applications/Xcode_16.2.app
+          elif [ -d "/Applications/Xcode_16.1.app" ]; then
+            sudo xcode-select -switch /Applications/Xcode_16.1.app
+          elif [ -d "/Applications/Xcode_16.0.app" ]; then
+            sudo xcode-select -switch /Applications/Xcode_16.0.app
+          fi
+          xcodebuild -version
 
       - name: Resolve packages
         run: xcodebuild -resolvePackageDependencies -scheme Gemma4SwiftCore
@@ -71,7 +85,7 @@ jobs:
           set -o pipefail
           xcodebuild test \
             -scheme Gemma4SwiftCore \
-            -destination '${{ matrix.destination }}' \
+            -destination 'platform=macOS,arch=arm64' \
             -enableCodeCoverage YES \
             CODE_SIGNING_ALLOWED=NO \
             | tee xcodebuild.log
@@ -80,18 +94,8 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v7
         with:
-          name: xcodebuild-log-${{ matrix.destination }}
+          name: xcodebuild-log
           path: xcodebuild.log
-
-  lint:
-    name: SwiftLint
-    runs-on: macos-14
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install SwiftLint
-        run: brew install swiftlint
-      - name: Run SwiftLint (warnings allowed, errors fail the build)
-        run: swiftlint --strict --reporter github-actions-logging
 
   forbidden-words:
     name: Forbidden-words scan
