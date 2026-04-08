@@ -98,9 +98,9 @@ final class ProportionalRoPETests: XCTestCase {
 
         // First freq is base^0 = 1.
         XCTAssertEqual(powf(base, 0), 1.0)
-        // Last freq is base^((rotatedDims-2)/dims) = 10000^(14/16) ≈ 4216.97.
+        // Last freq is base^((rotatedDims-2)/dims) = 10000^(14/16) = 10^3.5 ≈ 3162.28.
         let lastExponent = Float(rotatedDims - 2) / Float(dims)
-        XCTAssertEqual(powf(base, lastExponent), 4216.965, accuracy: 1.0)
+        XCTAssertEqual(powf(base, lastExponent), 3162.2776, accuracy: 1.0)
     }
 
     // MARK: - Preconditions
