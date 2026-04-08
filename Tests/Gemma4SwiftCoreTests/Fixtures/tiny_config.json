@@ -1,0 +1,40 @@
+{
+  "model_type": "gemma4_text",
+  "hidden_size": 32,
+  "num_hidden_layers": 5,
+  "intermediate_size": 64,
+  "num_attention_heads": 4,
+  "num_key_value_heads": 1,
+  "head_dim": 8,
+  "global_head_dim": 16,
+  "num_kv_shared_layers": 2,
+  "hidden_size_per_layer_input": 8,
+  "vocab_size_per_layer_input": 100,
+  "use_double_wide_mlp": true,
+  "attention_k_eq_v": false,
+  "enable_moe_block": false,
+  "sliding_window": 16,
+  "max_position_embeddings": 128,
+  "rms_norm_eps": 1e-6,
+  "vocab_size": 100,
+  "tie_word_embeddings": true,
+  "final_logit_softcapping": 30.0,
+  "layer_types": [
+    "sliding_attention",
+    "sliding_attention",
+    "sliding_attention",
+    "sliding_attention",
+    "full_attention"
+  ],
+  "rope_parameters": {
+    "sliding_attention": {
+      "rope_type": "default",
+      "rope_theta": 10000.0
+    },
+    "full_attention": {
+      "rope_type": "proportional",
+      "rope_theta": 1000000.0,
+      "partial_rotary_factor": 0.25
+    }
+  }
+}

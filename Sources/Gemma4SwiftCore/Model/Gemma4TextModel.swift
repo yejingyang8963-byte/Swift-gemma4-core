@@ -15,6 +15,7 @@
 
 import Foundation
 import MLX
+import MLXLLM
 import MLXLMCommon
 import MLXNN
 
