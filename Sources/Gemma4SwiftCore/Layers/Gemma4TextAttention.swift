@@ -60,7 +60,11 @@ public final class Gemma4TextAttention: Module {
     @ModuleInfo(key: "o_proj") public var oProj: Linear
     @ModuleInfo(key: "q_norm") public var qNorm: RMSNorm
     @ModuleInfo(key: "k_norm") public var kNorm: RMSNorm
-    @ModuleInfo public var rope: RoPELayer
+    // mlx-swift-lm 2.30.x exposes the rope helper return type as
+    // `OffsetLayer` (a public protocol from MLXNN). 2.31.x renamed it
+    // to `RoPELayer`. We pin to 2.30.x to keep CI compatible with the
+    // pre-Swift-6.1 toolchain on stock GitHub Actions runners.
+    @ModuleInfo public var rope: OffsetLayer
 
     // MARK: - Construction
 

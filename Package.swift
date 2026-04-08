@@ -22,10 +22,14 @@ let package = Package(
     ],
     dependencies: [
         // Apple's MLX Swift bindings — the underlying tensor library.
-        .package(url: "https://github.com/ml-explore/mlx-swift.git", from: "0.31.0"),
+        // Pinned to 0.30.x to satisfy mlx-swift-lm 2.30.x's dependency.
+        .package(url: "https://github.com/ml-explore/mlx-swift.git", "0.30.3" ..< "0.31.0"),
         // mlx-swift-lm provides the LLMModel protocol, KVCache types,
         // tokenizer integration, and the Hub download client we register against.
-        .package(url: "https://github.com/ml-explore/mlx-swift-lm.git", from: "2.31.0"),
+        // Pinned to 2.30.x (latest version with Swift 5.x tools support).
+        // 2.31.3 bumped swift-tools-version to 6.1.0 which requires Xcode 16.3+
+        // and breaks every CI runner that ships an older Xcode by default.
+        .package(url: "https://github.com/ml-explore/mlx-swift-lm.git", "2.30.0" ..< "2.31.0"),
     ],
     targets: [
         .target(
