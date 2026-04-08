@@ -55,10 +55,15 @@ jobs:
         run: swift build -v
 
       - name: swift test (pure-Swift suites only)
-        # Filter out MLX-dependent suites; they need the Metal library
-        # bundling that only xcodebuild test provides.
+        # Only ConfigurationTests and PromptFormattingTests are truly
+        # pure-Swift. ProportionalRoPETests instantiates Gemma4ProportionalRoPE
+        # which triggers MLX init via MLXArray construction; that fails on
+        # `swift test` because the Metal library bundle isn't on the dyld
+        # search path. SanitizeTests also imports MLX, and ModuleShapeTests
+        # run real modules. Everything MLX-touching is exercised by the
+        # xcodebuild-test job below, which DOES bundle the Metal library.
         run: |
-          swift test -v --filter "ConfigurationTests|ProportionalRoPETests|PromptFormattingTests"
+          swift test -v --filter "ConfigurationTests|PromptFormattingTests"
 
   xcodebuild-test:
     name: xcodebuild test (full MLX suite)
