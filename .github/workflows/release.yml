@@ -55,7 +55,10 @@ jobs:
           echo "✅ CHANGELOG.md has [$version]"
 
       - name: Run final test before release
-        run: swift test --filter "ConfigurationTests|ProportionalRoPETests|PromptFormattingTests"
+        # Same filter as ci.yml: only the truly pure-Swift suites.
+        # ProportionalRoPETests touches MLX via MLXArray construction in
+        # the rope class init, which crashes `swift test` on the runner.
+        run: swift test --filter "ConfigurationTests|PromptFormattingTests"
 
       - name: Extract release notes from CHANGELOG
         id: notes
