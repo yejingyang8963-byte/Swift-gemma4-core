@@ -252,6 +252,34 @@ produce. They match.
 | Pure Swift, no Python | ✅ | ✅ | ✅ |
 | iOS + macOS | ✅ | ✅ | ✅ |
 
+Every claim above is reproducible. See [`comparison/`](comparison/) for
+the evidence pack:
+
+- [`comparison/upstream_attempt.sh`](comparison/upstream_attempt.sh) —
+  shallow-clones `adrgrondin/mlx-swift-lm`, greps the model registry,
+  prints all 52 registered model types, and asserts `gemma4` is absent.
+  Exits 0 if our claim holds, 1 if upstream catches up.
+- [`comparison/upstream_registry_audit.md`](comparison/upstream_registry_audit.md) —
+  captured registry snapshot with the field-by-field schema diff
+  showing why `gemma3n` is **not** the same model as `gemma4`.
+- [`scripts/numerical_parity.py`](scripts/numerical_parity.py) — dumps
+  Python `mlx_lm` ground truth (token IDs + last-position logits +
+  16-step greedy sample) to `comparison/parity_python.json` so any
+  port can be verified layer-by-layer, not just at the prompt level.
+- [`comparison/benchmarks.md`](comparison/benchmarks.md) — published
+  throughput numbers and the `swift run Gemma4Verify` command to
+  reproduce them on your hardware.
+
+What this comparison **does not** claim, on purpose:
+
+- Not faster than upstream (same MLX Metal kernels, same arithmetic).
+- Not broader than upstream (1 model vs. 52).
+- Not more stable than upstream (we're 0.1.0 — time has not happened yet).
+
+We are exactly one thing: the only Swift package that loads
+`mlx-community/gemma-4-e2b-it-4bit` and produces the same tokens as
+Python `mlx_lm`. If you want any other model, use upstream.
+
 ## FAQ
 
 **Q: Do I need to download the model weights?**

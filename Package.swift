@@ -19,6 +19,10 @@ let package = Package(
             name: "Gemma4SwiftCore",
             targets: ["Gemma4SwiftCore"]
         ),
+        .executable(
+            name: "Gemma4Verify",
+            targets: ["Gemma4Verify"]
+        ),
     ],
     dependencies: [
         // Apple's MLX Swift bindings — the underlying tensor library.
@@ -45,6 +49,16 @@ let package = Package(
                 .product(name: "MLXLMCommon", package: "mlx-swift-lm"),
             ],
             path: "Sources/Gemma4SwiftCore"
+        ),
+        .executableTarget(
+            name: "Gemma4Verify",
+            dependencies: [
+                "Gemma4SwiftCore",
+                .product(name: "MLX", package: "mlx-swift"),
+                .product(name: "MLXLLM", package: "mlx-swift-lm"),
+                .product(name: "MLXLMCommon", package: "mlx-swift-lm"),
+            ],
+            path: "Sources/Gemma4Verify"
         ),
         .testTarget(
             name: "Gemma4SwiftCoreTests",
