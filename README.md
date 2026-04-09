@@ -316,7 +316,7 @@ If you use `Gemma4SwiftCore` in research or commercial work, please cite:
 ## Author
 
 Built and maintained by **[Jingyang Ye](https://github.com/yejingyang8963-byte)**
-(叶静阳).
+(叶经扬).
 
 This project is the open-source distillation of work originally done
 inside a private iOS app for on-device children's bedtime story
