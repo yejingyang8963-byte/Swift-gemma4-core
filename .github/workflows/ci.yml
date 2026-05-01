@@ -21,7 +21,7 @@ jobs:
         os: [macos-15]
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Select latest stable Xcode
         # mlx-swift-lm 2.31+ ships a Package.swift with
@@ -69,7 +69,7 @@ jobs:
     name: xcodebuild test (full MLX suite)
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Select latest stable Xcode
         run: |
@@ -106,6 +106,6 @@ jobs:
     name: Forbidden-words scan
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Scan for parent-project leakage
         run: bash scripts/verify_release.sh --check-words-only
