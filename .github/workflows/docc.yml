@@ -19,7 +19,7 @@ jobs:
     name: Build DocC archive
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Select latest stable Xcode
         # mlx-swift-lm 2.31+ requires Swift 6.1 (Xcode 16+).
